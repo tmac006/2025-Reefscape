@@ -6,17 +6,15 @@
 
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/button/CommandXboxController.h>
+#include <frc2/command/button/NetworkButton.h>
 
+#include <functional>
+#include <memory>
 #include "Constants.h"
 #include "subsystems/ExampleSubsystem.h"
 
-/**
- * This class is where the bulk of the robot should be declared.  Since
- * Command-based is a "declarative" paradigm, very little robot logic should
- * actually be handled in the {@link Robot} periodic methods (other than the
- * scheduler calls).  Instead, the structure of the robot (including subsystems,
- * commands, and trigger mappings) should be declared here.
- */
+#include "subsystems/Elevator.h"
+
 class RobotContainer {
  public:
   RobotContainer();
@@ -24,11 +22,17 @@ class RobotContainer {
   frc2::CommandPtr GetAutonomousCommand();
 
  private:
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  
+ void ConfigureBindings();
+  frc2::CommandPtr ElevatorVoltsSysIdCommands(
+      std::function<bool()> fwd, std::function<bool()> quasistatic);
+  frc2::CommandPtr ElevatorTorqueCurrentSysIdCommands(
+      std::function<bool()> fwd, std::function<bool()> quasistatic);
 
-  // The robot's subsystems are defined here...
   ExampleSubsystem m_subsystem;
+  Elevator m_elevatorSub;
+std::shared_ptr<nt::NetworkTable> tuningTable{nt::NetworkTableInstance::GetDefault().GetTable("Tuning")};
+    frc2::NetworkButton elevatorTuneBtn{tuningTable, "ElevatorPidTuning"};
+    frc2::NetworkButton elevatorSysIdVoltsBtn{tuningTable, "ElevatorSysIdVolts"};
+    frc2::NetworkButton elevatorSysIdTorqueCurrentBtn{tuningTable, "ElevatorSysIdTorqueCurrent"};
 
-  void ConfigureBindings();
 };
